@@ -1,0 +1,26 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: pdf-generate
+    redis:
+      host: localhost
+      port: 6379
+
+  datasource:
+    hikari:
+      minimumIdle: 10
+      maximumPoolSize: 200
+      idleTimeout: 120000
+      connectionTimeout: 300000
+      leakDetectionThreshold: 300000
+    password: sexb
+    username: postgres
+    url: jdbc:postgresql://localhost:5433/tws-info
+
+server:
+  tomcat:
+    threads:
+      max: 30
+  port: 8022
