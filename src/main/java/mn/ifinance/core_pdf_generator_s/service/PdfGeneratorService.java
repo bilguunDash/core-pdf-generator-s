@@ -15,42 +15,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PdfGeneratorService {
 
-    public ByteArrayOutputStream generatePdf(PdfRequest pdfRequest, List<PdfBodyReq> pdfBodyReqList) {
+    public ByteArrayOutputStream generatePdf(PdfRequest pdfRequest, List<PdfBodyReq> pdfBodyReqList) throws DocumentException, IOException {
         // Use A4 page size for layout
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        try {
-            PdfWriter writer = PdfWriter.getInstance(document, outputStream);
-            document.open();
-
-            // Add header elements
-            addHeaderElements(document, pdfRequest);
-
-            // Add metadata
-            if (pdfRequest.getMeta() != null) {
-                addMetadata(document, pdfRequest.getMeta());
-                document.add(Chunk.NEWLINE); // Add a line break after metadata
-            }
-
-            // Add data rows
-            if (pdfRequest.getHeader() != null && !pdfBodyReqList.isEmpty()) {
-                addDataRows(document, pdfRequest.getHeader(), pdfBodyReqList);
-            }
-
-            // Add printed date
-            addPrintedDate(document);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (document.isOpen()) {
-                document.close();
-            }
+        PdfWriter writer = null;
+        writer = PdfWriter.getInstance(document, outputStream);
+        document.open();
+        // Add header elements
+        addHeaderElements(document, pdfRequest);
+        // Add metadata
+        if (pdfRequest.getMeta() != null) {
+            addMetadata(document, pdfRequest.getMeta());
+            document.add(Chunk.NEWLINE); // Add a line break after metadata
         }
+        // Add data rows
+        if (pdfRequest.getHeader() != null && !pdfBodyReqList.isEmpty()) {
+            addDataRows(document, pdfRequest.getHeader(), pdfBodyReqList);
+        }
+        // Add printed date
+        addPrintedDate(document);
+        if (document.isOpen()) {
+            document.close();
+        }
+        writer.close();
 
         return outputStream;
     }
+
 
     private void addHeaderElements(Document document, PdfRequest pdfRequest) throws IOException, DocumentException {
         PdfPTable headerTable = new PdfPTable(3);
@@ -98,7 +91,6 @@ public class PdfGeneratorService {
             }
         } catch (BadElementException | IOException e) {
             // If the image URL is invalid, handle the exception and use a default placeholder image
-            System.out.println("Invalid image URL, using placeholder image.");
             Image placeholder = Image.getInstance("https://via.placeholder.com/40");
             placeholder.scaleToFit(40, 40); // Adjust placeholder size
             placeholder.setAlignment(Element.ALIGN_LEFT);

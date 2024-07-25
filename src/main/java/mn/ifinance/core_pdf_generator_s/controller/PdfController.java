@@ -1,5 +1,6 @@
 package mn.ifinance.core_pdf_generator_s.controller;
 
+import com.itextpdf.text.DocumentException;
 import mn.ifinance.core_pdf_generator_s.module.PdfBodyReq;
 import mn.ifinance.core_pdf_generator_s.module.PdfRequest;
 import mn.ifinance.core_pdf_generator_s.repository.PdfBodyRepo;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +39,7 @@ public class PdfController {
     }
 
     @PostMapping("/generate/{id}")
-    public ResponseEntity<byte[]> generatePdf(@RequestBody PdfRequest pdfRequest, @PathVariable Integer id) {
+    public ResponseEntity<byte[]> generatePdf(@RequestBody PdfRequest pdfRequest, @PathVariable Integer id) throws DocumentException, IOException {
         Optional<PdfBodyReq> pdfBodyReqOptional = pdfBodyReqRepository.findById(id.toString());
 
         if (pdfBodyReqOptional.isEmpty()) {
@@ -57,7 +59,7 @@ public class PdfController {
     }
 
     @PostMapping("/all-generate")
-    public ResponseEntity<byte[]> allGenerate(@RequestBody PdfRequest pdfRequest) {
+    public ResponseEntity<byte[]> allGenerate(@RequestBody PdfRequest pdfRequest) throws DocumentException, IOException {
         List<PdfBodyReq> pdfBodyReqList = pdfBodyReqRepository.findAll();
         if (pdfBodyReqList.isEmpty()) {
             return ResponseEntity.notFound().build();
